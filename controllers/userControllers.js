@@ -1,19 +1,40 @@
-const { createUser, getUserByEmail } = require('../services/userServices');
-const { schemaCreateUser } = require('../utils/validates');
+const userService = require('../services/userServices');
 
 const create = async (req, res) => {
   const { displayName, email, password, image } = req.body;
+  console.log(email, 'controller');
 
-  try {
-    schemaCreateUser.validate({ displayName, email, password, image });
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
-  const userByEmail = await getUserByEmail(email);
-  if (userByEmail) return res.status(409).json({ message: 'User already registered' });
+  const { err, token } = await userService.createUser({ displayName, email, password, image });
 
-  const user = await createUser({ displayName, email, password, image });
-  return res.status(201).json(user);
+  if (err) return res.status(409).json(err);
+  res.status(201).json({ token });
 };
 
-module.exports = { create }; 
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  const { err, token } = await userService.loginUser({ email, password });
+
+  if (err) return res.status(400).json(err);
+  res.status(200).json({ token });
+};
+
+const getAll = async (req, res) => {
+  const users = await userService.getAllUser();
+
+  res.status(200).json(users);
+};
+
+const getById = async (req, res) => {
+  const { id } = req.params;
+  const { user, err } = await userService.getUserById(id);
+
+  if (err) return res.status(404).json(err);
+  res.status(200).json(user);
+};
+
+module.exports = {
+  create,
+  login,
+  getAll,
+  getById,
+};

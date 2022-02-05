@@ -1,11 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const userControllers = require('./controllers/userControllers');
-// const {
-//   // emailValidate,
-//   // passwordValidate,
-//   // // emailExistValidate,
-// } = require('./utils/validates');
+const { validateCreateUser, validateLogin, validateJWT } = require('./utils/userValidate');
 
 const app = express();
 app.use(bodyParser.json());
@@ -17,9 +13,7 @@ app.get('/', (request, response) => {
   response.send();
 });
 
-app.post('/user',
-// nameValidate,
-// emailValidate,
-// emailExistValidate,
-// passwordValidate,
-userControllers.create);
+app.post('/user', validateCreateUser, userControllers.create);
+app.post('/login', validateLogin, userControllers.login);
+app.get('/user', validateJWT, userControllers.getAll);
+app.get('/user/:id', validateJWT, userControllers.getById);
