@@ -2,8 +2,6 @@ const userService = require('../services/userServices');
 
 const create = async (req, res) => {
   const { displayName, email, password, image } = req.body;
-  console.log(email, 'controller');
-
   const { err, token } = await userService.createUser({ displayName, email, password, image });
 
   if (err) return res.status(409).json(err);
